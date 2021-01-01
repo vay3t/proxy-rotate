@@ -3,29 +3,35 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/elazarl/goproxy"
-	"net/http"
-	proxy2 "github.com/casadosdados/proxy-rotate/proxy"
 	"log"
+	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/elazarl/goproxy"
+	proxy2 "github.com/vay3t/proxy-rotate/proxy"
 )
 
 func main() {
-	var host string
-	flag.StringVar(&host, "h", "0.0.0.0:8888", "host and port")
+	host := flag.String("host", "127.0.0.1", "host address")
+	port := flag.Int("port", 9999, "host port")
+
 	flag.Parse()
 
+	portString := strconv.Itoa(*port)
+
 	httpServer := &http.Server{
-		Addr:         host,
+		Addr:         *host + ":" + portString,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
 	}
+
 	httpServer.SetKeepAlivesEnabled(false)
 	proxy2.ProxyList = new(proxy2.ProxyBucket)
 	go proxy2.ProxyList.Start()
-	fmt.Println("Starting proxy server ", host)
+	fmt.Println("Starting proxy server ", *host)
 	proxy := goproxy.NewProxyHttpServer()
-	//proxy.Verbose = true
+	proxy.Verbose = true
 	proxy.Tr = proxy2.NewTransport(proxy)
 
 	httpServer.Handler = proxy

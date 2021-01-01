@@ -4,26 +4,23 @@ package proxy
 
 import (
 	"context"
-	"github.com/elazarl/goproxy"
 	"log"
 	"net"
 	"net/http"
 	"net/url"
 	"sync"
 	"time"
-	"github.com/casadosdados/proxy-rotate/util"
-	"github.com/casadosdados/socks"
-)
 
+	"github.com/casadosdados/socks"
+	"github.com/elazarl/goproxy"
+	"github.com/vay3t/proxy-rotate/util"
+)
 
 var proxys []string
 var ProxyList *ProxyBucket
 var proxyCacheIgnore = NewProxyCacheIgnore()
 
-
-
-
-func forward(proxy *goproxy.ProxyHttpServer) func(network, addr string) (net.Conn, error)  {
+func forward(proxy *goproxy.ProxyHttpServer) func(network, addr string) (net.Conn, error) {
 
 	dial := func(network, addr string) (net.Conn, error) {
 		// Prevent upstream proxy from being re-directed
@@ -37,7 +34,7 @@ func forward(proxy *goproxy.ProxyHttpServer) func(network, addr string) (net.Con
 			log.Fatal("failed to parse upstream server:", err)
 		}
 
-		if u.Scheme == "socks5" || u.Scheme == "socks4"{
+		if u.Scheme == "socks5" || u.Scheme == "socks4" {
 			dialSocks := socks.Dial(toAddr)
 			return dialSocks(network, addr)
 		}
@@ -51,7 +48,7 @@ func forward(proxy *goproxy.ProxyHttpServer) func(network, addr string) (net.Con
 	return dial
 }
 
-func forwardContext(proxy *goproxy.ProxyHttpServer) func(ctx2 context.Context, network, addr string) (net.Conn, error)  {
+func forwardContext(proxy *goproxy.ProxyHttpServer) func(ctx2 context.Context, network, addr string) (net.Conn, error) {
 
 	dial := func(ctx2 context.Context, network, addr string) (net.Conn, error) {
 		// Prevent upstream proxy from being re-directed
@@ -65,7 +62,7 @@ func forwardContext(proxy *goproxy.ProxyHttpServer) func(ctx2 context.Context, n
 			log.Fatal("failed to parse upstream server:", err)
 		}
 
-		if u.Scheme == "socks5" || u.Scheme == "socks4"{
+		if u.Scheme == "socks5" || u.Scheme == "socks4" {
 			dialSocks := socks.Dial(toAddr)
 			return dialSocks(network, addr)
 		}
@@ -79,19 +76,17 @@ func forwardContext(proxy *goproxy.ProxyHttpServer) func(ctx2 context.Context, n
 	return dial
 }
 
-func NewTransport (proxy *goproxy.ProxyHttpServer) *http.Transport {
+func NewTransport(proxy *goproxy.ProxyHttpServer) *http.Transport {
 	return &http.Transport{
-		DialContext:    		forwardContext(proxy),
-		Dial:    				forward(proxy),
-		DisableKeepAlives:		true,
-		IdleConnTimeout:		90 * time.Second,
-		TLSHandshakeTimeout:	10 * time.Second,
-		ExpectContinueTimeout: 	1 * time.Second,
-		MaxIdleConns:			100,
+		DialContext:           forwardContext(proxy),
+		Dial:                  forward(proxy),
+		DisableKeepAlives:     true,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		MaxIdleConns:          100,
 	}
 }
-
-
 
 func (pb *ProxyBucket) RandomProxy() *Proxy {
 	lenProxys := len(pb.Proxy)
@@ -105,7 +100,6 @@ func (pb *ProxyBucket) RandomProxy() *Proxy {
 	//log.Println("proxy returned", index, p)
 	return p
 }
-
 
 type ProxyCacheIgnore struct {
 	sync.RWMutex
