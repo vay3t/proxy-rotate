@@ -1,45 +1,46 @@
 package proxy
 
 import (
-	"fmt"
-	"github.com/parnurzeal/gorequest"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/parnurzeal/gorequest"
 )
 
 var URL_PROXY_LIST = map[string]string{
-	"http": "https://www.proxy-list.download/api/v1/get?type=http",
+	"http":   "https://www.proxy-list.download/api/v1/get?type=http",
 	"socks4": "https://www.proxy-list.download/api/v1/get?type=socks4",
 	"socks5": "https://www.proxy-list.download/api/v1/get?type=socks5",
 }
+
 const URL_API_IP = "http://ip-api.com/json/"
 const WORKERS_PROXY_LIST = 20
 
 var FilterByCountry = os.Getenv("COUNTRY")
 
 type Proxy struct {
-	Host string `json:"host"`
-	Port int `json:"port"`
+	Host   string `json:"host"`
+	Port   int    `json:"port"`
 	Schema string `json:"schema"`
-	Info struct {
-		AS string `json:"as"`
-		City string `json:"city"`
-		Country string `json:"country"`
-		ContryCode string `json:"countryCode"`
-		Isp string `json:"isp"`
-		Query string `json:"query"`
-		Region string `json:"region"`
-		RegionName string `json:"regionName"`
-		Status string `json:"status"`
-		Timezone string `json:"timezone"`
-		Zip string `json:"zip"`
-		Lat float64 `json:"lat"`
-		Lon float64 `json:"lon"`
+	Info   struct {
+		AS         string  `json:"as"`
+		City       string  `json:"city"`
+		Country    string  `json:"country"`
+		ContryCode string  `json:"countryCode"`
+		Isp        string  `json:"isp"`
+		Query      string  `json:"query"`
+		Region     string  `json:"region"`
+		RegionName string  `json:"regionName"`
+		Status     string  `json:"status"`
+		Timezone   string  `json:"timezone"`
+		Zip        string  `json:"zip"`
+		Lat        float64 `json:"lat"`
+		Lon        float64 `json:"lon"`
 	}
 }
 
@@ -106,13 +107,13 @@ func (p *ProxyBucket) Start() {
 				}
 				newProxy := &Proxy{
 					Schema: typeProxy,
-					Host: hostPort[0],
-					Port: port,
+					Host:   hostPort[0],
+					Port:   port,
 				}
 				ch <- newProxy
 			}
 			close(ch)
-			for i:=0; i<=WORKERS_PROXY_LIST; i++ {
+			for i := 0; i <= WORKERS_PROXY_LIST; i++ {
 				go p.newProxy(ch)
 			}
 		}
@@ -123,7 +124,7 @@ func (p *ProxyBucket) Start() {
 func (p *ProxyBucket) newProxy(ch chan *Proxy) {
 	for proxy := range ch {
 		if proxy.Schema != "socks4" {
-			if err:= proxy.Check(); err != nil {
+			if err := proxy.Check(); err != nil {
 				//log.Println("error on check", proxy.Parse(), err)
 				continue
 			}
@@ -142,4 +143,3 @@ func (p *ProxyBucket) newProxy(ch chan *Proxy) {
 		p.Proxy = append(p.Proxy, proxy)
 	}
 }
-

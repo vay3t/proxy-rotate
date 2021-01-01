@@ -29,7 +29,7 @@ func main() {
 	httpServer.SetKeepAlivesEnabled(false)
 	proxy2.ProxyList = new(proxy2.ProxyBucket)
 	go proxy2.ProxyList.Start()
-	fmt.Println("Starting proxy server ", *host)
+	fmt.Println("Starting proxy server ", "http://"+*host+":"+portString)
 	proxy := goproxy.NewProxyHttpServer()
 	proxy.Verbose = true
 	proxy.Tr = proxy2.NewTransport(proxy)
