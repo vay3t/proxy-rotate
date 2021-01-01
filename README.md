@@ -1,18 +1,14 @@
-### Proxy Rotate
+# Proxy Rotate mod. by Vay3t
 Proxy server using [goproxy](https://github.com/elazarl/goproxy) and [Proxy List](https://www.proxy-list.download/) for rotate proxy
 
 #### Support filter by country
 add env: COUNTRY=br (case insensitive)
 
-#### Run with docker
+#### Run
 ```bash
-docker run --name proxy-rotate -p 8888:8888 -e COUNTRY=br -d casadosdados/proxy-rotate
+go run cmd/proxy-rotate/main.go
 ```
 
-#### With Golang
-```bash
-go run main/proxy
-```
-Default port: 8888
+Default port: 9999
 
-Connecting: https://localhost:8888
+Connecting: http://localhost:9999
