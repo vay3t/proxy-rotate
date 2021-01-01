@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/elazarl/goproxy"
-	proxy2 "github.com/vay3t/proxy-rotate/proxy"
+	proxy2 "github.com/vay3t/proxy-rotate/pkg/proxy"
 )
 
 func main() {

@@ -13,7 +13,7 @@ import (
 
 	"github.com/casadosdados/socks"
 	"github.com/elazarl/goproxy"
-	"github.com/vay3t/proxy-rotate/util"
+	"github.com/vay3t/proxy-rotate/pkg/util"
 )
 
 var proxys []string
